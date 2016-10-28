@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="slh_capture">
+
+	<typeAlias alias="captureDomain" type="slh.capture.domain.CaptureDomain" />
+
+	<resultMap id="captureResultMap" class="captureDomain">
+		<result column="id" property="id" />
+		<result column="app_name" property="appName" />
+		<result column="user_name" property="userName" />
+		<result column="channel_name" property="channelName" />
+		<result column="news_user_amount" property="newsUserAmount" />
+		<result column="statis_time" property="statisDate" />
+	</resultMap>
+
+	<sql id="slh_capture_data_query_conditions">
+		<dynamic>
+			<isNotEmpty prepend="and" property="appId">
+				app_id =#appId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="userId">
+				user_id =#userId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="statisDate">
+				statis_time =#statisDate#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="channelName">
+				channel_name like concat('%',#channelName#,'%')
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<select id="getCaptureDataCount" resultClass="java.lang.Integer"
+		parameterClass="captureDomain">
+		SELECT COUNT(1) FROM slh_capture_data
+		WHERE 1 = 1
+		<include refid="slh_capture_data_query_conditions" />
+	</select>
+
+	<select id="getCaptureDataList" resultMap="captureResultMap"
+		parameterClass="captureDomain">
+		SELECT
+		id,
+		(select app_name from slh_app_info where id=app_id) as app_name,
+		(select name from slh_account_info where id=user_id) as user_name,
+		channel_name,
+		news_user_amount,
+		statis_time
+		FROM slh_capture_data
+		WHERE 1=1
+		<include refid="slh_capture_data_query_conditions" />
+		order by statis_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+
+	<insert id="insertCaptureData" parameterClass="captureDomain">
+		INSERT INTO slh_capture_data
+	    (app_id,user_id,channel_name,news_user_amount,statis_time, create_time)
+		VALUES 
+		(#appId#, #userId#,#channelName#,#newsUserAmount#,#statisDate#, NOW())
+	</insert>
+
+
+	<delete id="deleteCaptureData" parameterClass="captureDomain">
+		delete from
+		slh_capture_data
+		where
+		1=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="appId">
+				app_id =#appId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="userId">
+				user_id =#userId#
+			</isNotEmpty>
+		</dynamic>
+	</delete>
+
+</sqlMap>

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_capture_plat">
+
+	<typeAlias alias="CapturePlat" type="slh.capture.domain.CapturePlat" />
+	
+	
+	<resultMap id="abatorgenerated_CapturePlatResult" class="CapturePlat" >
+	    <result column="id" property="id" />
+	    <result column="channel_code" property="channelCode" />
+	    <result column="user_name" property="userName" />
+	    <result column="product_name" property="productName" />
+	    <result column="password" property="password" />
+	    <result column="login_url" property="loginUrl" />
+	    <result column="login_img_url" property="loginImgUrl" />
+	    <result column="query_page_url" property="queryPageUrl" />
+	    <result column="query_url" property="queryUrl" />
+	    <result column="company" property="company" />
+	</resultMap>
+	
+	
+	<sql id="slh_capture_plat.abatorgenerated_slh_capture_plat_query_conditions" >
+	    <dynamic>
+	    	<isNotEmpty property="company">
+	    		<isNotNull prepend="and" property="company" >
+			        company like #company#
+			    </isNotNull>
+	    	</isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="query_slh_count" resultClass="java.lang.Integer"	parameterClass="CapturePlat">
+		SELECT COUNT(1) FROM slh_capture_plat 
+		WHERE 1 = 1
+		<include refid="slh_capture_plat.abatorgenerated_slh_capture_plat_query_conditions"/>
+	</select>
+	<select id="select_slh_model_page_list" resultMap="abatorgenerated_CapturePlatResult" parameterClass="CapturePlat">
+		SELECT id, channel_code, user_name, product_name, password, login_url, login_img_url, query_page_url, query_url, company 
+		FROM slh_capture_plat 
+		where 1=1 
+		<include refid="slh_capture_plat.abatorgenerated_slh_capture_plat_query_conditions"/>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	<select id="select_slh_model_list" resultMap="abatorgenerated_CapturePlatResult" parameterClass="CapturePlat">
+		SELECT id,  channel_code, user_name, product_name, password, login_url, login_img_url, query_page_url, query_url, company 
+		FROM slh_capture_plat
+		WHERE 1 = 1
+		<include refid="slh_capture_plat.abatorgenerated_slh_capture_plat_query_conditions"/>
+		ORDER BY modify_time DESC
+	</select>
+	
+	<select id="select_slh_model" resultMap="abatorgenerated_CapturePlatResult" parameterClass="CapturePlat">
+		SELECT id,  channel_code, user_name, product_name, password, login_url, login_img_url, query_page_url, query_url, company 
+		FROM slh_capture_plat
+		WHERE id = #id#
+	</select>
+	
+	
+	<insert id="insert_slh_model" parameterClass="CapturePlat" >
+	  INSERT INTO slh_capture_plat ( channel_code, user_name, product_name, password, login_url, login_img_url, query_page_url, query_url, company, create_time, modify_time)
+	  VALUES (#channelCode#, #userName#, #productName#, #password#, #loginUrl#, #loginImgUrl#, #queryPageUrl#, #queryUrl#, #company#, NOW(), NOW())
+	  <selectKey resultClass="java.lang.Integer" keyProperty="id" >
+	    SELECT LAST_INSERT_ID()
+	  </selectKey>
+	</insert>
+	
+	<update id="update_slh_model" parameterClass="CapturePlat" >
+	  UPDATE slh_capture_plat SET modify_time = NOW()
+	  <dynamic>
+	    <isNotNull prepend="," property="userName">
+	      user_name = #userName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="productName">
+	      product_name = #productName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="password">
+	      password = #password#
+	    </isNotNull>
+	    <isNotNull prepend="," property="company">
+	      company = #company#
+	    </isNotNull>
+	    <isNotNull prepend="," property="channelCode">
+	      channel_code = #channelCode#
+	    </isNotNull>
+	    <isNotNull prepend="," property="loginUrl">
+	      login_url = #loginUrl#
+	    </isNotNull>
+	    <isNotNull prepend="," property="loginImgUrl">
+	      login_img_url = #loginImgUrl#
+	    </isNotNull>
+	    <isNotNull prepend="," property="queryPageUrl">
+	      query_page_url = #queryPageUrl#
+	    </isNotNull>
+	    <isNotNull prepend="," property="queryUrl">
+	      query_url = #queryUrl#
+	    </isNotNull>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="delete_slh_model" parameterClass="CapturePlat">
+		delete from slh_capture_plat where id = #id#
+	</delete>
+	
+		
+</sqlMap>

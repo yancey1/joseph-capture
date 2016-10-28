@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_channelmange">
+
+	<typeAlias alias="ChannelMange" type="slh.capture.domain.ChannelMange" />
+	
+	<resultMap id="abatorgenerated_channelmangeResult" class="ChannelMange" >
+	    <result column="cm_id" property="cmId" />
+	    <result column="inc_id" property="incId" />
+	    <result column="product_name" property="productName" />
+	    <result column="partner_id" property="partnerId" />
+	    <result column="channel_code" property="channelCode" />
+	    <result column="channel_name" property="channelName" />
+	    <result column="single_price" property="singlePrice" />
+	    <result column="min_price" property="minPrice" />
+	    <result column="share_percent" property="sharePercent" />
+	    <result column="single_percent" property="singlePercent" />
+	    <result column="tax_rate" property="taxRate" />
+	    <result column="bad_debt" property="badDebt" />
+	    <result column="mark" property="mark" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	<resultMap id="channelmangeResult" class="ChannelMange" >
+	    <result column="cm_id" property="cmId" />
+	    <result column="partner_id" property="partnerId" />
+	    <result column="inc_id" property="incId" />
+	    <result column="channel_code" property="channelCode" />
+	    <result column="channel_name" property="channelName" />
+	    <result column="single_price" property="singlePrice" />
+	    <result column="min_price" property="minPrice" />
+	    <result column="share_percent" property="sharePercent" />
+	    <result column="single_percent" property="singlePercent" />
+	    <result column="tax_rate" property="taxRate" />
+	    <result column="bad_debt" property="badDebt" />
+	    <result column="mark" property="mark" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="advertise_name" property="contentName" />
+	    <result column="company" property="providerContent" />
+	</resultMap>
+	
+	
+	
+	<sql id="slh_channelmange.abatorgenerated_slh_channelmange_query_conditions" >
+	    <dynamic>
+	      <isNotNull prepend="and" property="contentName" >
+	        inc.advertise_name like '%$contentName$%'
+	      </isNotNull>
+	      <isNotNull prepend="and" property="incId" >
+	        cm.inc_id = #incId# 
+	      </isNotNull>
+	      <isNotNull prepend="and" property="partnerId" >
+	        cm.partner_id = #partnerId# 
+	      </isNotNull>
+	      <isNotEmpty property="cmIdList">
+	    		<iterate prepend=" and cm_id not in " open="(" close=")" conjunction="," property="cmIdList">
+	    			#cmIdList[]#
+	    		</iterate>
+	      </isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="select_slh_channelmange_page_list_count" resultClass="java.lang.Integer"	parameterClass="ChannelMange">
+		SELECT COUNT(1) FROM slh_channel_mange cm,slh_introduction_content inc ,slh_channel_business b 
+		WHERE cm.inc_id = inc.inc_id and cm.partner_id = b.cb_id 
+		<include refid="slh_channelmange.abatorgenerated_slh_channelmange_query_conditions"/>
+	</select>
+	<select id="select_slh_channelmange_page_list" resultMap="channelmangeResult" parameterClass="ChannelMange">
+		SELECT cm.*,inc.advertise_name,inc.provider_content,b.company 
+		FROM slh_channel_mange cm,slh_introduction_content inc ,slh_channel_business b 
+		WHERE cm.inc_id = inc.inc_id and cm.partner_id = b.cb_id 
+		<include refid="slh_channelmange.abatorgenerated_slh_channelmange_query_conditions"/>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	
+	<select id="select_slh_channelmange_list" resultMap="abatorgenerated_channelmangeResult" parameterClass="ChannelMange">
+		SELECT cm.*,inc.advertise_name,inc.provider_content,b.company 
+		FROM slh_channel_mange cm,slh_introduction_content inc ,slh_channel_business b 
+		WHERE cm.inc_id = inc.inc_id and cm.partner_id = b.cb_id 
+		<include refid="slh_channelmange.abatorgenerated_slh_channelmange_query_conditions"/>
+		ORDER BY modify_time DESC
+	</select>
+	<select id="select_slh_channelmange" resultMap="channelmangeResult" parameterClass="ChannelMange">
+		SELECT cm.*,inc.advertise_name,inc.provider_content,b.company 
+		FROM slh_channel_mange cm,slh_introduction_content inc ,slh_channel_business b 
+		WHERE cm.inc_id = inc.inc_id and cm.partner_id = b.cb_id 
+		<dynamic>
+			<isNotNull prepend="and" property="cmId">
+				cm_id = #cmId#
+			</isNotNull>
+			<isNotNull prepend="and" property="incId">
+				inc.inc_id = #incId#
+			</isNotNull>
+			<isNotNull prepend="and" property="channelCode">
+				cm.channel_code = #channelCode#
+			</isNotNull>
+			<isNotNull prepend="and" property="productName">
+				cm.product_name = #productName#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	
+		
+</sqlMap>

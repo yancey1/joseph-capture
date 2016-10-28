@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_paymentquery">
+
+	<typeAlias alias="PaymentQuery" type="slh.capture.domain.PaymentQuery" />
+	
+	
+	<resultMap id="paymentResult" class="PaymentQuery" >
+	    <result column="pq_id" property="pqId" />
+	    <result column="cm_id" property="cmId" />
+	    <result column="ex_date" property="exDate" />
+	    <result column="set_account" property="setAccount" />
+	    <result column="partner" property="partner" />
+	    <result column="pq_type" property="pqType" />
+	    <result column="partner_id" property="partnerId" />
+	    <result column="product_name" property="productName" />
+	    <result column="product_id" property="productId" />
+	    <result column="channel_code" property="channelCode" />
+	    <result column="channel_name" property="channelName" />
+	    <result column="proxy_price" property="proxyPrice" />
+	    <result column="share_percent" property="sharePercent" />
+	    <result column="single_percent" property="singlePercent" />
+	    <result column="min_num" property="minNum" />
+	    <result column="install_costs" property="installCosts" />
+	    <result column="tp_install" property="tpInstall" />
+	    <result column="payable" property="payable" />
+	    <result column="settle_num" property="settleNum" />
+	    <result column="state" property="state" />
+	    <result column="tax_rate" property="taxRate" />
+	    <result column="bad_debt" property="badDebt" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	
+	<sql id="slh_paymentquery.slh_recvie_query_conditions" >
+	    <dynamic>
+	    	<isNotEmpty property="cmIdList">
+	    		<iterate prepend=" and cm_id in " open="(" close=")" conjunction="," property="cmIdList">
+	    			#cmIdList[]#
+	    		</iterate>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="cmId">
+	    		<isNotNull prepend="and" property="cmId">
+	    			cm_id = #cmId# 
+	    		</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="productId">
+	    		<isNotNull prepend="and" property="productId">
+	    			product_id = #productId# 
+	    		</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="pqType">
+	    		<isNotNull prepend="and" property="pqType">
+	    			pq_type = #pqType# 
+	    		</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="partnerId">
+	    		<isNotNull prepend="and" property="partnerId">
+	    			partner_id = #partnerId# 
+	    		</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="productName">
+	    		<isNotNull prepend="and" property="productName">
+	    			product_name like '%$productName$%' 
+	    		</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				ex_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				ex_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="exDate">
+	    				ex_date = #exDate#
+	    	</isNotEmpty>
+	    	<isNotEmpty property="channelCode">
+		    	<isNotNull prepend="and" property="channelCode">
+		    		channel_code like '%$channelCode$%'
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty>
+		    	<isNotNull prepend="and" property="channelName">
+		    		channel_name like '%$channelName$%'
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotNull prepend="and" property="pqType">
+	    		pq_type = #pqType#
+	    	</isNotNull>
+		<isNotNull property="settleNum">
+			<isNotEmpty prepend="and" property="settleNum">
+				settle_num = #settleNum#
+			</isNotEmpty>
+		</isNotNull>
+	    </dynamic>
+	</sql>
+
+	<!-- 应付查询 start -->
+	<select id="select_slh_paymentquery_page_list_count" resultClass="java.lang.Integer"	parameterClass="PaymentQuery">
+		SELECT COUNT(1) FROM slh_payment_query  
+		WHERE 1 = 1 
+		<include refid="slh_paymentquery.slh_recvie_query_conditions"/>
+	</select>
+	<select id="select_slh_paymentquery_page_list" resultMap="paymentResult" parameterClass="PaymentQuery">
+		SELECT pq_id, cm_id, ex_date,set_account, partner, pq_type, partner_id,product_name, product_id, channel_code, channel_name, proxy_price, share_percent, single_percent, min_num, install_costs, tp_install, payable, settle_num,state,tax_rate, bad_debt,create_time,modify_time 
+		FROM slh_payment_query 
+		WHERE 1 = 1 
+		<include refid="slh_paymentquery.slh_recvie_query_conditions"/>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	
+	
+	<!-- 应付查询 start -->
+	
+	<select id="select_slh_paymentquery_settle_page_list_count" resultClass="java.lang.Integer"	parameterClass="PaymentQuery">
+		SELECT COUNT(1) FROM (select product_name from slh_payment_query  
+		WHERE 1 = 1 
+		<include refid="slh_paymentquery.slh_recvie_query_conditions"/>
+		GROUP BY product_name,channel_code ) as total
+	</select>
+	<select id="select_slh_paymentquery_settle_page_list" resultMap="paymentResult" parameterClass="PaymentQuery">
+		SELECT SUM(payable) as payable,pq_id, cm_id, ex_date,set_account, partner, pq_type, partner_id,product_name, product_id, channel_code, channel_name, proxy_price, share_percent, single_percent, min_num, SUM(install_costs) as install_costs, tp_install, payable, settle_num,state,tax_rate, bad_debt,create_time,modify_time 
+		FROM slh_payment_query 
+		WHERE 1 = 1 
+		<include refid="slh_paymentquery.slh_recvie_query_conditions"/>
+		GROUP BY product_name,channel_code 
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	<select id="select_slh_paymentquery_settle_list" resultMap="paymentResult" parameterClass="PaymentQuery">
+		SELECT SUM(payable) as payable,pq_id, cm_id, ex_date,set_account, partner, pq_type, partner_id,product_name, product_id, channel_code, channel_name, proxy_price, share_percent, single_percent, min_num, SUM(install_costs) as install_costs, tp_install, payable, settle_num,state,tax_rate, bad_debt,create_time,modify_time 
+		FROM slh_payment_query 
+		WHERE 1 = 1 
+		<include refid="slh_paymentquery.slh_recvie_query_conditions"/>
+		GROUP BY product_name,channel_code 
+		ORDER BY modify_time DESC
+	</select>
+	<select id="select_slh_paymentquery_channel_list" resultMap="paymentResult" parameterClass="PaymentQuery">
+		SELECT pq_id, cm_id, ex_date,set_account, partner, pq_type, partner_id,product_name, product_id, channel_code, channel_name, proxy_price, share_percent, single_percent, min_num, install_costs, tp_install, payable, settle_num,state,tax_rate, bad_debt,create_time,modify_time 
+		FROM slh_payment_query
+		WHERE 1 = 1 
+		<include refid="slh_paymentquery.slh_recvie_query_conditions"/>
+		ORDER BY modify_time DESC
+	</select>
+	<select id="select_slh_paymentquery_list" resultMap="paymentResult" parameterClass="PaymentQuery">
+		SELECT pq_id, cm_id, ex_date,set_account, partner, pq_type, partner_id,product_name, product_id, channel_code, channel_name, proxy_price, share_percent, single_percent, min_num, install_costs, tp_install, payable, settle_num,state,tax_rate, bad_debt,create_time,modify_time 
+		FROM slh_payment_query
+		WHERE 1 = 1 
+		<include refid="slh_paymentquery.slh_recvie_query_conditions"/>
+		ORDER BY modify_time DESC
+	</select>
+	<select id="select_slh_paymentquery" resultMap="paymentResult" parameterClass="PaymentQuery">
+		SELECT pq_id, cm_id, ex_date,set_account, partner, pq_type, partner_id,product_name, product_id, channel_code, channel_name, proxy_price, share_percent, single_percent, min_num, install_costs, tp_install, payable, settle_num,state,tax_rate, bad_debt,create_time,modify_time 
+		FROM slh_payment_query
+		WHERE 1 = 1 
+		<include refid="slh_paymentquery.slh_recvie_query_conditions"/>
+		
+	</select>
+	
+	<insert id="insert_slh_paymentquery" parameterClass="PaymentQuery" >
+	  INSERT INTO slh_payment_query (pq_id, cm_id, ex_date,set_account, partner, pq_type, partner_id,product_name, product_id, channel_code, channel_name, proxy_price, share_percent, single_percent, min_num, install_costs, tp_install, payable, settle_num,state,tax_rate, bad_debt,create_time,modify_time)
+	  VALUES (#pqId#, #cmId#,#exDate#, #setAccount#, #partner#, #pqType#, #partnerId#, #productName#, #productId#,  #channelCode#, #channelName#, #proxyPrice#, #sharePercent#, #singlePercent#, #minNum#, #installCosts#, #tpInstall#, #payable#, #settleNum#, #state#, #taxRate#, #badDebt#, NOW(), NOW())
+	  <selectKey resultClass="java.lang.Integer" keyProperty="pqId" >
+	    SELECT LAST_INSERT_ID()
+	  </selectKey>
+	</insert>
+	
+	<update id="update_slh_paymentquery" parameterClass="PaymentQuery" >
+	  UPDATE slh_payment_query SET modify_time = NOW(),settle_num = #settleNum#
+	 <isNotNull prepend="," property="state">
+	  	state = #state#
+	  </isNotNull>
+	  WHERE pq_id = #pqId#
+	</update>
+	<delete id="delete_slh_paymentquery" parameterClass="PaymentQuery">
+		delete from slh_payment_query 
+		where 1 = 1
+		<dynamic>
+			<isNotNull prepend="and" property="pqId">
+				  pq_id = #pqId#
+			</isNotNull>
+			<isNotEmpty property="channelCode">
+			    	<isNotNull prepend="and" property="channelCode">
+			    		channel_code = #channelCode#
+			    	</isNotNull>
+		    	</isNotEmpty>
+		    	<isNotEmpty property="productId">
+			    	<isNotNull prepend="and" property="productId">
+			    		product_id = #productId#
+			    	</isNotNull>
+		    	</isNotEmpty>
+		    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				ex_date >= #startDate#
+	    			]]>
+		    	</isNotEmpty>
+		    	<isNotEmpty prepend="and" property="endDate">
+		    		<![CDATA[
+		    			ex_date <= #endDate#
+		    		]]>
+		    	</isNotEmpty>
+		</dynamic>
+		
+	</delete>
+	
+	
+		
+</sqlMap>

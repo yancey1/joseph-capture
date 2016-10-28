@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_recivequery">
+
+	<typeAlias alias="ReciveQuery" type="slh.capture.domain.ReciveQuery" />
+	
+	
+	<resultMap id="reciveResult" class="ReciveQuery" >
+	    <result column="rq_id" property="rqId" />
+	    <result column="partner_id" property="partnerId" />
+	    <result column="rq_date" property="rqDate" />
+	    <result column="partner" property="partner" />
+	    <result column="product_name" property="productName" />
+	    <result column="product_id" property="productId" />
+	    <result column="channel_code" property="channelCode" />
+	    <result column="channel_name" property="channelName" />
+	    <result column="rq_type" property="rqType" />
+	    <result column="introduct_price" property="introductPrice" />
+	    <result column="rq_ratio" property="rqRatio" />
+	    <result column="tax_rate" property="taxRate" />
+	    <result column="bad_debt" property="badDebt" />
+	    <result column="install_costs" property="installCosts" />
+	    <result column="should_recive" property="shouldRecive" />
+	    <result column="settle_num" property="settleNum" />
+	    <result column="recive_state" property="reciveState" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	
+	
+	<sql id="slh_recivequery.slh_recvie_query_conditions" >
+	    <dynamic>
+	    	<isNotEmpty property="productIds">
+	    		<iterate prepend=" and product_id in " open="(" close=")" conjunction="," property="productIds">
+	    			#productIds[]#
+	    		</iterate>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				rq_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				rq_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="rqDate">
+	    				rq_date = #rqDate#
+	    	</isNotEmpty>
+	    	<isNotEmpty property="productName">
+		    	<isNotNull prepend="and" property="productName">
+		    		product_name like '%$productName$%'
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="channelName">
+		    	<isNotNull prepend="and" property="channelName">
+		    		channel_name like '%$channelName$%'
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="channelCode">
+		    	<isNotNull prepend="and" property="channelCode">
+		    		channel_code like '%$channelCode$%'
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="productId">
+		    	<isNotNull prepend="and" property="productId">
+		    		product_id = #productId#
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="rqType">
+		    	<isNotNull prepend="and" property="rqType">
+		    		rq_type = #rqType#
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="partnerId">
+		    	<isNotNull prepend="and" property="partnerId">
+		    		partner_id = #partnerId#
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotNull property="settleNum">
+			<isNotEmpty prepend="and" property="settleNum">
+				settle_num = #settleNum#
+			</isNotEmpty>
+		</isNotNull>
+	    </dynamic>
+	</sql>
+
+	<select id="select_slh_recivequery_page_list_count" resultClass="java.lang.Integer"	parameterClass="ReciveQuery">
+		SELECT COUNT(1) FROM slh_recive_query  
+		WHERE 1 = 1 
+		<include refid="slh_recivequery.slh_recvie_query_conditions"/>
+	</select>
+	<select id="select_slh_recivequery_page_list" resultMap="reciveResult" parameterClass="ReciveQuery">
+		SELECT rq_id, rq_date, partner, partner_id, product_name, product_id, channel_code, channel_name, rq_type, introduct_price, rq_ratio, tax_rate, bad_debt, install_costs, should_recive, settle_num,recive_state,create_time,modify_time 
+		FROM slh_recive_query 
+		WHERE 1 = 1 
+		<include refid="slh_recivequery.slh_recvie_query_conditions"/>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	
+	
+	
+	<select id="select_slh_recivequery_settle_page_list_count" resultClass="java.lang.Integer"	parameterClass="ReciveQuery">
+		SELECT COUNT(1) FROM (select product_name from slh_recive_query  
+		WHERE 1 = 1 
+		<include refid="slh_recivequery.slh_recvie_query_conditions"/>
+		
+		GROUP BY product_name,channel_code ) as total
+		
+	</select>
+	<select id="select_slh_recivequery_settle_page_list" resultMap="reciveResult" parameterClass="ReciveQuery">
+		SELECT SUM(should_recive) as should_recive, rq_id, rq_date, partner, partner_id, product_name, product_id, channel_code, channel_name, rq_type, introduct_price, rq_ratio, tax_rate, bad_debt,SUM(install_costs) as install_costs, should_recive, settle_num,recive_state,create_time,modify_time 
+		FROM slh_recive_query 
+		WHERE 1 = 1 
+		<include refid="slh_recivequery.slh_recvie_query_conditions"/>
+		
+		GROUP BY product_name ,channel_code 
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	<select id="select_slh_recivequery_settle_set_list" resultMap="reciveResult" parameterClass="ReciveQuery">
+		SELECT SUM(should_recive) as should_recive, rq_id, rq_date, partner, partner_id, product_name, product_id, channel_code, channel_name, rq_type, introduct_price, rq_ratio, tax_rate, bad_debt,SUM(install_costs) as install_costs, should_recive, settle_num,recive_state,create_time,modify_time 
+		FROM slh_recive_query 
+		WHERE 1 = 1 
+		<include refid="slh_recivequery.slh_recvie_query_conditions"/>
+		
+		GROUP BY product_name ,channel_code 
+		ORDER BY modify_time DESC
+	</select>
+	<select id="select_slh_recivequery_list" resultMap="reciveResult" parameterClass="ReciveQuery">
+		SELECT rq_id, rq_date, partner, partner_id, product_name, product_id, channel_code, channel_name, rq_type, introduct_price, rq_ratio, tax_rate, bad_debt, install_costs, should_recive, settle_num,recive_state,create_time,modify_time 
+		FROM slh_recive_query 
+		WHERE 1 = 1   
+		<include refid="slh_recivequery.slh_recvie_query_conditions"/>
+		ORDER BY modify_time DESC
+	</select>
+	<select id="select_slh_recivequery_settle_list" resultMap="reciveResult" parameterClass="ReciveQuery">
+		SELECT rq_id, rq_date, partner, partner_id, product_name, product_id, channel_code, channel_name, rq_type, introduct_price, rq_ratio, tax_rate, bad_debt, install_costs, should_recive, settle_num,recive_state,create_time,modify_time 
+		FROM slh_recive_query 
+		WHERE 1 = 1 
+		<include refid="slh_recivequery.slh_recvie_query_conditions"/>
+		ORDER BY modify_time DESC
+	</select>
+	<select id="select_slh_recivequery" resultMap="reciveResult" parameterClass="ReciveQuery">
+		SELECT rq_id, rq_date, partner, partner_id, product_name, product_id, channel_code, channel_name, rq_type, introduct_price, rq_ratio, tax_rate, bad_debt, install_costs, should_recive, settle_num,recive_state,create_time,modify_time  
+		FROM slh_recive_query 
+		WHERE 1 = 1 
+		<include refid="slh_recivequery.slh_recvie_query_conditions"/>
+		
+	</select>
+	
+	<insert id="insert_slh_recivequery" parameterClass="ReciveQuery" >
+	  INSERT INTO slh_recive_query (rq_id, partner_id, rq_date, partner, product_name, product_id, channel_code, channel_name, rq_type, introduct_price, rq_ratio, tax_rate, bad_debt, install_costs, should_recive, settle_num,recive_state,create_time,modify_time)
+	  VALUES (#rqId#, #partnerId#, #rqDate#, #partner#, #productName#, #productId#, #channelCode#, #channelName#, #rqType#, #introductPrice#, #rqRatio#, #taxRate#, #badDebt#, #installCosts#, #shouldRecive#, #settleNum#, #reciveState#, NOW(), NOW())
+	  <selectKey resultClass="java.lang.Integer" keyProperty="rqId" >
+	    SELECT LAST_INSERT_ID()
+	  </selectKey>
+	</insert>
+	
+	<update id="update_slh_recivequery" parameterClass="ReciveQuery" >
+	  UPDATE slh_recive_query SET modify_time = NOW(),settle_num = #settleNum# 
+	 <isNotNull prepend="," property="reciveState">
+	  	recive_state = #reciveState#
+	  </isNotNull>
+	  WHERE rq_id = #rqId#
+	</update>
+	<delete id="delete_slh_recivequery" parameterClass="ReciveQuery">
+		delete from slh_recive_query 
+		where 1 = 1 
+		<dynamic>
+			<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				rq_date >= #startDate#
+	    			]]>
+		    	</isNotEmpty>
+		    	<isNotEmpty property="rqId">
+		    		<isNotNull prepend="and" property="rqId">
+		    			rq_id = #rqId#
+		    		</isNotNull>
+		    	</isNotEmpty>
+		    	<isNotEmpty prepend="and" property="endDate">
+		    			<![CDATA[
+		    				rq_date <= #endDate#
+		    			]]>
+		    	</isNotEmpty>
+		    	<isNotEmpty property="channelCode">
+			    	<isNotNull prepend="and" property="channelCode">
+			    		channel_code = #channelCode#
+			    	</isNotNull>
+		    	</isNotEmpty>
+		    	<isNotEmpty property="productId">
+			    	<isNotNull prepend="and" property="productId">
+			    		product_id = #productId#
+			    	</isNotNull>
+		    	</isNotEmpty>
+		</dynamic>
+	</delete>
+		
+</sqlMap>

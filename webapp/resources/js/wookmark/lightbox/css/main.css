@@ -1,0 +1,138 @@
+/** General page styling **/
+html {
+  background-color: #fff;
+}
+
+#main {
+  margin: 10px 0;
+  position: relative;
+}
+
+/**
+ * Grid container
+ */
+#images {
+  list-style-type: none;
+  position: relative; /** Needed to ensure items are laid out relative to this container **/
+  margin: 0;
+  padding: 0;
+}
+
+/**
+ * Grid items
+ */
+#images li {
+  width: 200px;
+  background-color: #fff;
+  border: 1px solid #dedede;
+          border-radius: 2px;
+     -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  display: none; /** Hide items initially to avoid a flicker effect **/
+  cursor: pointer;
+  padding: 4px;
+}
+
+#images li.inactive {
+  visibility: hidden;
+  opacity: 0;
+}
+
+#images li img {
+  display: block;
+}
+
+/**
+ * Grid item text
+ */
+#images li p {
+  color: #666;
+  font-size: 12px;
+  margin: 7px 0 0 7px;
+}
+
+/**
+ * Grid container
+ */
+#apks {
+  list-style-type: none;
+  position: relative; /** Needed to ensure items are laid out relative to this container **/
+  margin: 0;
+  padding: 0;
+}
+
+/**
+ * Grid items
+ */
+#apks li {
+  width: 490px;
+  background-color: #fff;
+  border: 1px solid #dedede;
+          border-radius: 2px;
+     -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  display: none; /** Hide items initially to avoid a flicker effect **/
+  padding: 2px;
+  // cursor: pointer;
+}
+
+#apks li.inactive {
+  visibility: hidden;
+  opacity: 0;
+}
+
+#apks li img {
+  float: left;
+  display: block;
+}
+
+#apks li .apk-info-basic {
+  width: 480px;
+  height: 280px;
+}
+#apks li .apk-info-basic p {
+  padding-left: 73px;
+  color: #666;
+  font-size: 12px;
+  margin: 5px 0;
+  word-break: break-all;
+}
+#apks li .apk-info-basic p a {
+  color: #444647;
+  font-weight: bold;
+  text-decoration: none;
+  outline: none;
+  cursor: pointer;
+}
+#apks li .apk-info-basic p label {
+  color: #000;
+}
+
+#apks li .apk-info-desc {
+  clear: left;
+  width: 480px;
+}
+#apks li .apk-info-desc p {
+  padding-left: 2px;
+  color: #666;
+  font-size: 12px;
+  margin: 5px 0;
+  word-break: break-all;
+}
+#apks li .apk-info-desc p label {
+  color: #000;
+}
+
+/**
+ * Placerholder css
+ */
+.wookmark-placeholder {
+          border-radius: 2px;
+     -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  background-color: #eee;
+  border: 1px solid #dedede;
+  z-index: -1;
+}
+#loader{height:16px;padding:25px 0;text-align:center;}
+#loaderCircle{width:16px;height:16px;margin:0 auto;background-image:url(/resources/js/wookmark/lightbox/css/images/loader.gif);}

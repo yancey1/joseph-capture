@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_introduct">
+
+	<typeAlias alias="Introduct" type="slh.capture.domain.IntroductionContent" />
+	
+	<resultMap id="abatorgenerated_introductResult" class="Introduct" >
+	    <result column="inc_id" property="incId" />
+	    <result column="partner_id" property="partnerId" />
+	    <result column="advertise_name" property="advertiseName" />
+	    <result column="inc_type" property="incType" />
+	    <result column="single_price" property="singlePrice" />
+	    <result column="commerce_sign" property="commerceSign" />
+	    <result column="data_type" property="dataType" />
+	    <result column="single_capture_ratio" property="singleCaptureRatio" />
+	    <result column="statistical_data" property="statisticalData" />
+	    <result column="account" property="account" />
+	    <result column="password" property="password" />
+	    <result column="company" property="providerContent" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="tax_rate" property="taxRate" />
+	    <result column="bad_debt" property="badDebt" />
+	    <result column="mark" property="mark" />
+	</resultMap>
+	
+	
+	<sql id="slh_introduct.abatorgenerated_slh_introduct_query_conditions" >
+	    <dynamic>
+	      <isNotNull prepend="and" property="partnerId" >
+	        partner_id = #partnerId#
+	      </isNotNull>
+	      <isNotNull prepend="and" property="incType" >
+	        inc_type = #incType#
+	      </isNotNull>
+	      <isNotNull prepend="and" property="incId" >
+	        inc_id = #incId#
+	      </isNotNull>
+	    </dynamic>
+	</sql>
+
+	<select id="select_slh_introduct_page_list_count" resultClass="java.lang.Integer"	parameterClass="Introduct">
+		SELECT COUNT(1) FROM slh_introduction_content
+		WHERE 1 = 1
+		<include refid="slh_introduct.abatorgenerated_slh_introduct_query_conditions"/>
+	</select>
+	<select id="select_slh_introduct_page_list" resultMap="abatorgenerated_introductResult" parameterClass="Introduct">
+		SELECT i.*,s.company
+		FROM slh_introduction_content i,slh_supplier s
+		WHERE i.partner_id = s.supplier_id 
+		<include refid="slh_introduct.abatorgenerated_slh_introduct_query_conditions"/>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	
+	<select id="select_slh_introduct_list" resultMap="abatorgenerated_introductResult" parameterClass="Introduct">
+		SELECT i.*,s.company
+		FROM slh_introduction_content i,slh_supplier s
+		WHERE i.partner_id = s.supplier_id 
+		<dynamic>
+		  <isNotEmpty property="advertiseName" >
+		      <isNotNull prepend="and" property="advertiseName" >
+		        advertise_name LIKE '%$advertiseName$%'
+		      </isNotNull>
+		  </isNotEmpty>
+		  <isNotNull prepend="and" property="partnerId">
+		   	i.partner_id = #partnerId#
+		  </isNotNull>
+	    </dynamic>
+		ORDER BY modify_time DESC
+	</select>
+	
+	<select id="select_slh_introduct" resultMap="abatorgenerated_introductResult" parameterClass="Introduct">
+		SELECT i.*,s.company
+		FROM slh_introduction_content i,slh_supplier s
+		WHERE i.partner_id = s.supplier_id 
+		<dynamic>
+			<isNotNull prepend="and" property="incId">
+				inc_id = #incId#
+			</isNotNull>
+			<isNotNull prepend="and" property="advertiseName">
+				advertise_name = #advertiseName#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	<insert id="insert_slh_introduct" parameterClass="Introduct" >
+	  INSERT INTO slh_introduction_content (inc_id, partner_id, advertise_name, inc_type, single_price, commerce_sign, data_type, single_capture_ratio, statistical_data,account,password,provider_content, tax_rate, bad_debt, mark, create_time, modify_time)
+	  VALUES (#incId#, #partnerId#, #advertiseName#, #incType#, #singlePrice#, #commerceSign#, #dataType#, #singleCaptureRatio#,#statisticalData#,#account#,#password#,#providerContent#, #taxRate#, #badDebt#, #mark#, NOW(), NOW())
+	  <selectKey resultClass="java.lang.Integer" keyProperty="incId" >
+	    SELECT LAST_INSERT_ID()
+	  </selectKey>
+	</insert>
+	
+	<update id="update_slh_introduct" parameterClass="Introduct" >
+	  UPDATE slh_introduction_content SET modify_time = NOW()
+	  <dynamic>
+	    <isNotNull prepend="," property="mark">
+	      mark = #mark#
+	    </isNotNull>
+	    <isNotNull prepend="," property="commerceSign">
+	      commerce_sign = #commerceSign#
+	    </isNotNull>
+	    <isNotNull prepend="," property="singleCaptureRatio">
+	      single_capture_ratio = #singleCaptureRatio#
+	    </isNotNull>
+	     <isNotNull prepend="," property="taxRate">
+	      tax_rate = #taxRate#
+	    </isNotNull>
+	    <isNotNull prepend="," property="badDebt">
+	      bad_debt = #badDebt#
+	    </isNotNull>
+	    <isNotNull prepend="," property="advertiseName">
+	      advertise_name = #advertiseName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="singlePrice">
+	      single_price = #singlePrice#
+	    </isNotNull>
+	    <isNotNull prepend="," property="incType">
+	      inc_type = #incType#
+	    </isNotNull>
+	  </dynamic>
+	  WHERE inc_id = #incId#
+	</update>
+	<delete id="delete_slh_introduct" parameterClass="java.lang.Integer">
+		delete from slh_introduction_content where  inc_id = #incId#
+	</delete>
+		
+</sqlMap>

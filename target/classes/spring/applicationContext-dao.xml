@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd" default-autowire="byName">
+
+	<bean id="menuDAO" parent="commonDAO" class="slh.capture.dao.impl.MenuDAOImpl">
+	</bean>
+	<bean id="roleDAO" parent="commonDAO" class="slh.capture.dao.impl.RoleDAOImpl">
+	</bean>
+	<bean id="userDAO" parent="commonDAO" class="slh.capture.dao.impl.UserDAOImpl">
+	</bean>
+	<bean id="channelMangeDAO" parent="commonDAO" class="slh.capture.dao.impl.ChannelMangeDAOImpl">
+	</bean>
+	<bean id="intrductDAO" parent="commonDAO" class="slh.capture.dao.impl.IntroductDAOImpl">
+	</bean>
+	<bean id="operateDAO" parent="commonDAO" class="slh.capture.dao.impl.OperateDataDAOImpl">
+	</bean>
+	<bean id="paymentQueryDAO" parent="commonDAO" class="slh.capture.dao.impl.PaymentQueryDAOImpl">
+	</bean>
+	<bean id="reciveQueryDAO" parent="commonDAO" class="slh.capture.dao.impl.ReciveQueryDAOImpl">
+	</bean>
+	<bean id="scrabDAO" parent="commonDAO" class="slh.capture.dao.impl.ScrabDAOImpl">
+	</bean>
+	<bean id="capturePlatDAO" parent="commonDAO" class="slh.capture.dao.impl.CapturePlatDAOImpl">
+	</bean>
+	<bean id="captureQueryConditionDAO" parent="commonDAO" class="slh.capture.dao.impl.unified.CaptureConfigDAOImpl">
+	</bean>	
+	
+	
+</beans>

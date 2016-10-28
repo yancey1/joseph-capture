@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="slh_account">
+
+	<typeAlias alias="accountDomain" type="slh.capture.domain.AccountDomain" />
+
+	<resultMap id="accountResultMap" class="accountDomain">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="password" property="password" />
+		<result column="remark" property="remark" />
+		<result column="create_time" property="createTime" />
+		<result column="modify_time" property="modifyTime" />
+	</resultMap>
+
+	<sql id="slh_account_query_conditions">
+		<dynamic>
+			<isNotEmpty prepend="and" property="name">
+				name like concat('%',#name#,'%')
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<select id="getAccountCount" resultClass="java.lang.Integer"
+		parameterClass="accountDomain">
+		SELECT COUNT(1) FROM slh_account_info
+		WHERE 1 = 1
+		<include refid="slh_account_query_conditions" />
+	</select>
+
+	<select id="getAccountList" resultMap="accountResultMap"
+		parameterClass="accountDomain">
+		SELECT
+		id,
+		name,
+		password,
+		remark,
+		create_time,
+		modify_time
+		FROM slh_account_info
+		WHERE 1=1
+		<include refid="slh_account_query_conditions" />
+		order by modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+
+	<insert id="insertAccount" parameterClass="accountDomain">
+		INSERT INTO slh_account_info (name, password,remark, create_time,
+		modify_time)
+		VALUES (#name#, #password#,#remark#, NOW(), NOW())
+	</insert>
+
+	<update id="modifyAccount" parameterClass="accountDomain">
+		UPDATE slh_account_info SET modify_time = NOW()
+		<dynamic>
+			<isNotEmpty prepend="," property="name">
+				name = #name#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="password">
+				password = #password#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="remark">
+				remark = #remark#
+			</isNotEmpty>
+		</dynamic>
+		WHERE id = #id#
+	</update>
+
+	<delete id="deleteAccount" parameterClass="java.lang.Integer">
+		delete from
+		slh_account_info where id = #id#
+	</delete>
+
+	<select id="getAccountListByObj" resultMap="accountResultMap"
+		parameterClass="accountDomain">
+		SELECT
+		id,
+		name,
+		password,
+		remark,
+		create_time,
+		modify_time
+		FROM slh_account_info
+		WHERE 1=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="name">
+			    name=#name#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="id">
+			    id &lt;&gt; #id#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="accountId">
+			    id = #accountId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+</sqlMap>

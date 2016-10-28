@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_operate_data">
+
+	<typeAlias alias="OperateData" type="slh.capture.domain.OperateData" />
+	
+	
+	<resultMap id="opreateResult" class="OperateData" >
+	    <result column="op_id" property="opId" />
+	    <result column="partner_id" property="partnerId" />
+	    <result column="op_date" property="opDate" />
+	    <result column="partner_name" property="partnerName" />
+	    <result column="product_id" property="productId" />
+	    <result column="product_name" property="productName" />
+	    <result column="channel_code" property="channelCode" />
+	    <result column="channel_name" property="channelName" />
+	    <result column="op_type" property="opType" />
+	    <result column="install_costs" property="installCosts" />
+	    <result column="op_ratio" property="opRatio" />
+	    <result column="tax_rate" property="taxRate" />
+	    <result column="bad_debt" property="badDebt" />
+	    <result column="tp_tax_rate" property="tpTaxRate" />
+	    <result column="tp_bad_debt" property="tpBadDebt" />
+	    <result column="single_price" property="singlePrice" />
+	    <result column="oc_income" property="ocIncome" />
+	    <result column="share_percent" property="sharePercent" />
+	    <result column="single_percent" property="singlePercent" />
+	    <result column="proxy_price" property="proxyPrice" />
+	    <result column="min_num" property="minNum" />
+	    <result column="tp_income" property="tpIncome" />
+	    <result column="tp_install" property="tpInstall" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	</resultMap>
+	<sql id="slh_operate_data.slh_operate_data_conditions" >
+	    <dynamic>
+	    	<isNotEmpty property="productId">
+		    	<isNotNull prepend="and" property="productId">
+		    		product_id = #productId#
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="partnerId">
+		    	<isNotNull prepend="and" property="partnerId">
+		    		partner_id = #partnerId#
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="productName">
+		    	<isNotNull prepend="and" property="productName">
+		    		product_name like '%$productName$%'
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="channelCode">
+		    	<isNotNull prepend="and" property="channelCode">
+		    		channel_code like '%$channelCode$%'
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotEmpty property="channelName">
+		    	<isNotNull prepend="and" property="channelName">
+		    		channel_name like '%$channelName$%'
+		    	</isNotNull>
+	    	</isNotEmpty>
+	    	<isNotNull prepend="and" property="opType">
+	    		op_type = #opType#
+	    	</isNotNull>
+	    	<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				op_date >= #startDate#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endDate">
+	    			<![CDATA[
+	    				op_date <= #endDate#
+	    			]]>
+	    	</isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="select_slh_operate_data_page_list_count" resultClass="java.lang.Integer"	parameterClass="OperateData">
+		SELECT COUNT(1) FROM slh_operate_data  
+		WHERE 1 = 1 
+		<include refid="slh_operate_data.slh_operate_data_conditions"/>
+	</select>
+	<select id="select_slh_operate_data_page_list" resultMap="opreateResult" parameterClass="OperateData">
+		SELECT op_id, op_date, partner_name, partner_id, product_id, product_name, channel_code, channel_name, op_type, install_costs, op_ratio, 
+		tax_rate, bad_debt, single_price, oc_income, share_percent, single_percent, proxy_price, min_num, tp_income, tp_tax_rate, tp_bad_debt, tp_install, create_time,modify_time 
+		FROM slh_operate_data 
+		WHERE 1 = 1 
+		<include refid="slh_operate_data.slh_operate_data_conditions"/>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	
+	<select id="select_slh_operate_data_list" resultMap="opreateResult" parameterClass="OperateData">
+		SELECT op_id, op_date, partner_name, partner_id, product_id, product_name, channel_code, channel_name, op_type, install_costs, op_ratio, 
+		tax_rate, bad_debt, single_price, oc_income, share_percent, single_percent, proxy_price, min_num, tp_income, tp_tax_rate, tp_bad_debt, tp_install, create_time,modify_time 
+		FROM slh_operate_data 
+		WHERE 1 = 1 
+		<include refid="slh_operate_data.slh_operate_data_conditions"/>
+		ORDER BY modify_time DESC
+	</select>
+	<select id="select_slh_operate_data" resultMap="opreateResult" parameterClass="OperateData">
+		SELECT op_id, op_date, partner_name, partner_id, product_id, product_name, channel_code, channel_name, op_type, install_costs, op_ratio, 
+		tax_rate, bad_debt, single_price, oc_income, share_percent, single_percent, proxy_price, min_num, tp_income, tp_tax_rate, tp_bad_debt, tp_install, create_time,modify_time 
+		FROM slh_operate_data 
+		WHERE 1 = 1 
+		<include refid="slh_operate_data.slh_operate_data_conditions"/>
+		
+	</select>
+	
+	<insert id="insert_slh_operate_data" parameterClass="OperateData" >
+	  INSERT INTO slh_operate_data (op_id, op_date, partner_name, partner_id, product_id, product_name, channel_code, channel_name, op_type, install_costs, op_ratio, tax_rate, bad_debt, single_price, oc_income, share_percent, single_percent, proxy_price, min_num, tp_income, tp_tax_rate, tp_bad_debt, tp_install, create_time,modify_time)
+	  VALUES (#opId#, #opDate#, #partnerName#, #partnerId#, #productId#, #productName#, #channelCode#, #channelName#, #opType#, #installCosts#,  #opRatio#, 
+	  #taxRate#, #badDebt#, #singlePrice#, #ocIncome#, #sharePercent#, #singlePercent#, #proxyPrice#, #minNum#, #tpIncome#, #tpTaxRate#, #tpBadDebt#, #tpInstall#, NOW(), NOW())
+	  <selectKey resultClass="java.lang.Integer" keyProperty="opId" >
+	    SELECT LAST_INSERT_ID()
+	  </selectKey>
+	</insert>
+	
+	<delete id="delete_slh_operate_data" parameterClass="OperateData">
+		delete from slh_operate_data 
+		WHERE 1 = 1 
+		<dynamic>
+			<isNotEmpty property="productId">
+			    	<isNotNull prepend="and" property="productId">
+			    		product_id = #productId#
+			    	</isNotNull>
+	    		</isNotEmpty>
+	    		<isNotEmpty property="opId">
+			    	<isNotNull prepend="and" property="opId">
+			    		op_id = #opId#
+			    	</isNotNull>
+	    		</isNotEmpty>
+	    		<isNotEmpty prepend="and" property="startDate">
+	    			<![CDATA[
+	    				op_date >= #startDate#
+	    			]]>
+		    	</isNotEmpty>
+		    	<isNotEmpty prepend="and" property="endDate">
+		    			<![CDATA[
+		    				op_date <= #endDate#
+		    			]]>
+		    	</isNotEmpty>
+		    	<isNotEmpty property="channelCode">
+			    	<isNotNull prepend="and" property="channelCode">
+			    		channel_code = #channelCode#
+			    	</isNotNull>
+	    		</isNotEmpty>
+		</dynamic>
+	</delete>
+	
+		
+</sqlMap>

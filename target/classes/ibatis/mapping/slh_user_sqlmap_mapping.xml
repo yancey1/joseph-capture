@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_user">
+
+	<typeAlias alias="User" type="slh.capture.domain.User" />
+	<typeAlias alias="UserRole" type="slh.capture.domain.UserRole" />
+	<typeAlias alias="Role" type="slh.capture.domain.Role" />
+	<typeAlias alias="UserChannel" type="slh.capture.domain.UserChannel" />
+	<typeAlias alias="Menu" type="slh.capture.domain.Menu" />
+	
+	<resultMap id="abatorgenerated_UserResult" class="User" >
+	    <result column="user_id" property="userId" />
+	    <result column="user_name" property="userName" />
+	    <result column="nickname" property="nickname" />
+	    <result column="password" property="password" />
+	    <result column="status" property="status" />
+	    <result column="description" property="description" />
+	    <result column="create_time" property="createTime" />
+	    <result column="modify_time" property="modifyTime" />
+	    <result column="user_id" property="roleList" select="slh_user.getRolesByUserId"/>
+	</resultMap>
+	
+	<sql id="slh_user.abatorgenerated_slh_user_query_conditions" >
+	    <dynamic>
+	      <isNotNull prepend="and" property="nickname" >
+	        nickname = #nickname#
+	      </isNotNull>
+	      <isNotNull property="status" >
+	      	<isNotEmpty prepend="and" property="status">
+		        status = #status#
+	      	</isNotEmpty>
+	      </isNotNull>
+	      <isNotNull prepend="and" property="description" >
+	        description = #description#
+	      </isNotNull>
+	    </dynamic>
+	</sql>
+	<select id="getRolesByUserId" resultClass="Role" parameterClass="java.lang.Integer">
+		SELECT r.role_id AS roleId,r.role_name AS roleName,r.create_time AS createTime,r.description,r.modify_time As modifyTime,r.roles 
+		FROM slh_role r,slh_user_role ur 
+		WHERE r.role_id=ur.role_id and ur.user_id=#value#
+	</select>
+	
+
+	<select id="select_slh_user_page_list_count" resultClass="java.lang.Integer"	parameterClass="User">
+		SELECT COUNT(1) FROM slh_user u 
+		WHERE 1 = 1
+		<include refid="slh_user.abatorgenerated_slh_user_query_conditions"/>
+		<dynamic>
+			<isNotNull prepend="and" property="userName" >
+		        user_name like '%$userName$%'
+		     </isNotNull>
+		     <isNotNull prepend="and" property="rId" >
+		        u.user_id in(select r.user_id from slh_user_role r where r.role_id = #rId#)
+		    </isNotNull>
+		</dynamic>
+	</select>
+	<select id="select_slh_user_page_list" resultMap="abatorgenerated_UserResult" parameterClass="User">
+		SELECT user_id, user_name, nickname, password, status, description, create_time, modify_time
+		FROM slh_user u 
+		WHERE 1 = 1
+		<include refid="slh_user.abatorgenerated_slh_user_query_conditions"/>
+		<dynamic>
+			<isNotNull prepend="and" property="userName" >
+		        user_name like '%$userName$%'
+		     </isNotNull>
+		     <isNotNull prepend="and" property="rId" >
+		        u.user_id in(select r.user_id from slh_user_role r where r.role_id = #rId#)
+		    </isNotNull>
+		</dynamic>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	
+	<select id="select_slh_user_list" resultMap="abatorgenerated_UserResult" parameterClass="User">
+		SELECT user_id, user_name, nickname, password, status, description,  create_time, modify_time
+		FROM slh_user u 
+		WHERE 1 = 1
+		<include refid="slh_user.abatorgenerated_slh_user_query_conditions"/>
+		<dynamic>
+			<isNotNull prepend="and" property="userName" >
+		        user_name like '%$userName$%'
+		     </isNotNull>
+		</dynamic>
+	</select>
+	
+	<select id="select_slh_user" resultMap="abatorgenerated_UserResult" parameterClass="User">
+		SELECT user_id, user_name, nickname, password, status, description, create_time, modify_time
+		FROM slh_user
+		WHERE 1 = 1
+		<include refid="slh_user.abatorgenerated_slh_user_query_conditions"/>
+		<dynamic>
+			<isNotEmpty property="userName">
+				<isNotNull prepend="and" property="userName">
+					user_name = #userName#
+				</isNotNull>
+			</isNotEmpty>
+			<isNotNull prepend="and" property="userId">
+				user_id = #userId#
+			</isNotNull>
+		</dynamic>
+	</select>
+	
+	<insert id="insert_slh_user" parameterClass="User" >
+	  INSERT INTO slh_user (user_name, nickname, password, status, description, create_time, modify_time)
+	  VALUES (#userName#, #nickname#, #password#, #status#,  #description#, NOW(), NOW())
+	  <selectKey resultClass="java.lang.Integer" keyProperty="userId" >
+	    SELECT LAST_INSERT_ID()
+	  </selectKey>
+	</insert>
+	
+	<update id="update_slh_user" parameterClass="User" >
+	  UPDATE slh_user SET modify_time = NOW()
+	  <dynamic>
+	    <isNotNull prepend="," property="userName">
+	      user_name = #userName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="nickname">
+	      nickname = #nickname#
+	    </isNotNull>
+	    <isNotNull property="password">
+	    	<isNotEmpty prepend=","  property="password">
+		      password = #password#
+	    	</isNotEmpty>
+	    </isNotNull>
+	    <isNotNull prepend="," property="status">
+	      status = #status#
+	    </isNotNull>
+	    <isNotNull prepend="," property="description">
+	      description = #description#
+	    </isNotNull>
+	  </dynamic>
+	  WHERE user_id = #userId#
+	</update>
+	
+	<delete id="delete_slh_user" parameterClass="java.lang.Integer">
+		delete from slh_user where user_id = #userId#
+	</delete>
+	
+	
+	<!-- start 用户角色 -->
+	
+	<resultMap id="user_role_result" class="UserRole">
+		<result column="user_id" property="userId"/>
+		<result column="role_id" property="roleId"/>
+	</resultMap>
+	
+	<select id="select_slh_user_role" resultMap="user_role_result" parameterClass="UserRole">
+		select user_id,role_id from slh_user_role where user_id = #userId# and role_id = #roleId#
+	</select>
+	
+	<insert id="insert_slh_user_role" parameterClass="UserRole">
+		insert into slh_user_role(user_id,role_id) values(#userId#,#roleId#)
+	</insert>
+	
+	<delete id="delete_slh_user_role" parameterClass="UserRole">
+		delete from slh_user_role where user_id =#userId#
+	</delete>
+	<!-- end 用户角色 -->
+	
+
+		<!-- start 用户的权限 -->
+	<resultMap id="user_menu_result" class="Menu" >
+	    <result column="resource_id" property="resourceId" />
+	    <result column="resource_name" property="resourceName" />
+	    <result column="permission" property="permission" />
+	    <result column="resource_url" property="resourceUrl" />
+	    <result column="parent" property="parent" />
+	    <result column="display_sort" property="displaySort" />
+	    <result column="display_type" property="displayType" />
+	    <result column="description" property="description" />
+	</resultMap>
+	
+	<select id="select_slh_user_menu_list" resultMap="user_menu_result" parameterClass="User">
+		SELECT
+			m.*
+		FROM
+			slh_user u,
+			slh_user_role ur,
+			slh_role r,
+			slh_role_resource rr,
+			slh_resource m
+		WHERE
+			u.user_id = ur.user_id
+		AND ur.role_id = r.role_id
+		AND r.role_id = rr.role_id
+		AND rr.resource_id = m.resource_id
+		AND u.user_name = #userName# 
+		GROUP BY
+			m.resource_id
+		order by m.display_sort asc 
+	</select>
+	
+	
+	<!-- start 用户的权限 -->
+		
+</sqlMap>

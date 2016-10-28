@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="slh_scrab">
+
+	<typeAlias alias="Scrab" type="slh.capture.domain.ScrabData" />
+	
+	<resultMap id="abatorgenerated_scrabResult" class="Scrab" >
+	    <result column="biz_date" property="bizDate" />
+	    <result column="product_name" property="productName" />
+	    <result column="channel_id" property="channelId" />
+	    <result column="biz_type" property="bizType" />
+	    <result column="biz_amount" property="bizAmount" />
+	    <result column="state" property="state" />
+	    <result column="mark" property="mark" />
+	    <result column="create_time" property="createTime" />
+	</resultMap>
+	
+	<sql id="slh_scrab.abatorgenerated_slh_scrab_query_conditions" >
+	    <dynamic>
+	    	
+	      <isNotEmpty property="productName">
+		      <isNotNull prepend="and" property="productName" >
+		        product_name = #productName#
+		      </isNotNull>
+	      </isNotEmpty>
+	      <isNotEmpty property="channelId">
+		      <isNotNull prepend="and" property="channelId" >
+		        channel_id = #channelId#
+		      </isNotNull>
+	      </isNotEmpty>
+	       <isNotEmpty property="userName">
+		      <isNotNull prepend="and" property="userName" >
+		        user_name = #userName#
+		      </isNotNull>
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="state" >
+	        state = #state#
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="bookMark" >
+	        book_mark = #bookMark#
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="bizDate">
+	      	biz_date = #bizDate#
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="startTime">
+	    			<![CDATA[
+	    				biz_date >= #startTime#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endTime">
+	    			<![CDATA[
+	    				biz_date <= #endTime#
+	    			]]>
+	    	</isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="select_slh_scrab_page_list_count" resultClass="java.lang.Integer"	parameterClass="Scrab">
+		SELECT COUNT(1) FROM slh_biz_data_info
+		WHERE 1 = 1
+		<include refid="slh_scrab.abatorgenerated_slh_scrab_query_conditions"/>
+	</select>
+	<select id="select_slh_scrab_page_list" resultMap="abatorgenerated_scrabResult" parameterClass="Scrab">
+		SELECT biz_date, product_name, channel_id, biz_type, biz_amount, mark, state, create_time 
+		FROM slh_biz_data_info 
+		WHERE 1=1 
+		<include refid="slh_scrab.abatorgenerated_slh_scrab_query_conditions"/>
+		ORDER BY biz_date DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	<select id="select_slh_scrab_list" resultMap="abatorgenerated_scrabResult" parameterClass="Scrab">
+		SELECT biz_date,product_name,channel_id,biz_type,biz_amount,mark, state, create_time 
+		FROM slh_biz_data_info 
+		WHERE 1=1 
+		<include refid="slh_scrab.abatorgenerated_slh_scrab_query_conditions"/>
+		ORDER BY biz_date DESC
+	</select>
+	<select id="select_slh_scrab" resultMap="abatorgenerated_scrabResult" parameterClass="Scrab">
+		SELECT biz_date,product_name,channel_id,biz_type,biz_amount,mark, state, create_time 
+		FROM slh_biz_data_info 
+		WHERE 1=1 
+		<include refid="slh_scrab.abatorgenerated_slh_scrab_query_conditions"/>
+	</select>
+	
+	<select id="select_slh_scrab_by_book_mark" resultMap="abatorgenerated_scrabResult" parameterClass="Scrab">
+		SELECT biz_date,product_name,channel_id,biz_type,biz_amount,mark, state, create_time 
+		FROM slh_biz_data_info 
+		WHERE book_mark = #bookMark# 
+		ORDER BY biz_date DESC 
+		LIMIT 0,1
+	</select>
+	
+	<insert id="insert_slh_scrab" parameterClass="Scrab" >
+	  INSERT INTO slh_biz_data_info (biz_date, product_name, channel_id,user_name, biz_type, biz_amount,book_mark,state, mark, create_time, modify_time) 
+	  VALUES (#bizDate#, #productName#, #channelId#, #userName#,#bizType#, #bizAmount#, #bookMark#, #state#,  #mark#, NOW(), NOW())
+	</insert>
+	
+	<update id="update_slh_scrab" parameterClass="Scrab">
+	update slh_biz_data_info set modify_time = NOW() ,mark = #mark#
+	<isNotNull prepend="," property="bizAmount">
+		biz_amount = #bizAmount#
+	</isNotNull>
+	<isNotNull prepend="," property="state">
+		state = #state#
+	</isNotNull>
+	where 1 = 1 
+	<dynamic>
+		<isNotNull prepend="and" property="bizDate">
+			biz_date = #bizDate#
+		</isNotNull>
+		<isNotNull prepend="and" property="productName">
+			product_name = #productName#
+		</isNotNull>
+		<isNotNull prepend="and" property="channelId">
+			channel_id = #channelId#
+		</isNotNull>
+	</dynamic>
+	</update>
+	
+	<delete id="deleteScr" parameterClass="Scrab">
+		delete from slh_biz_data_info where 1=1
+		<dynamic>
+			 <isNotEmpty property="productName">
+		      <isNotNull prepend="and" property="productName" >
+		        product_name = #productName#
+		      </isNotNull>
+	      </isNotEmpty>
+	      <isNotEmpty property="channelId">
+		      <isNotNull prepend="and" property="channelId" >
+		        channel_id = #channelId#
+		      </isNotNull>
+	      </isNotEmpty>
+	       <isNotEmpty property="userName">
+		      <isNotNull prepend="and" property="userName" >
+		        user_name = #userName#
+		      </isNotNull>
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="state" >
+	        state = #state#
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="bookMark" >
+	        book_mark = #bookMark#
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="bizDate">
+	      	biz_date = #bizDate#
+	      </isNotEmpty>
+	      <isNotEmpty prepend="and" property="startTime">
+	    			<![CDATA[
+	    				biz_date >= #startTime#
+	    			]]>
+	    	</isNotEmpty>
+	    	<isNotEmpty prepend="and" property="endTime">
+	    			<![CDATA[
+	    				biz_date <= #endTime#
+	    			]]>
+	    	</isNotEmpty>
+		</dynamic>
+	</delete>
+</sqlMap>

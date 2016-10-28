@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:tool="http://www.springframework.org/schema/tool" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd  
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd  
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd  
+     http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd  
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd  
+     http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd  
+     http://www.springframework.org/schema/tool http://www.springframework.org/schema/tool/spring-tool.xsd"
+	default-lazy-init="true" default-autowire="byName">
+
+	<bean id="bossDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		abstract="false"  lazy-init="false" autowire="default"
+		destroy-method="close">
+		<property name="driverClass" value="${boss.jdbc.driver}" />
+		<property name="jdbcUrl" value="${boss.jdbc.url}" />
+		<property name="user" value="${boss.jdbc.username}" />
+		<property name="password" value="${boss.jdbc.password}" />
+		<property name="minPoolSize" value="${boss.jdbc.minPoolSize}" />
+		<property name="maxPoolSize" value="${boss.jdbc.maxPoolSize}" />
+		<property name="maxIdleTime" value="${boss.jdbc.maxIdleTime}" />
+		<property name="initialPoolSize" value="${boss.jdbc.initialPoolSize}" />
+		<property name="numHelperThreads" value="${boss.jdbc.numHelperThreads}" />
+		<property name="idleConnectionTestPeriod" value="${boss.jdbc.idleConnectionTestPeriod}" />
+		<property name="preferredTestQuery" value="${boss.jdbc.preferredTestQuery}" />
+	</bean>
+
+	<bean id="bossSqlMap" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocations">
+			<list>
+				<value>classpath:ibatis/sqlmap-config.xml</value>
+			</list>
+		</property>
+		<property name="dataSource">
+			<ref bean="bossDataSource" />
+		</property>
+	</bean>		
+
+	<!-- 数据库路由规则配置 -->
+	<bean id="dbRouteConfig" class="edu.hziee.common.dbroute.config.DBRouteConfig">
+		<property name="sqlMapList">
+			<map>
+				<entry key="bossDB">
+					<ref local="bossSqlMap" />
+				</entry>
+			</map>
+		</property>
+		<property name="defaultNodeNameList">
+			<list>
+				<value>bossDB</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="bossDefaultDB" class="edu.hziee.common.dbroute.config.DBRoute">
+		<constructor-arg value="bossDB" />
+	</bean>
+
+	<bean id="baseDAO" abstract="true" class="edu.hziee.common.dbroute.BaseDAO">
+		<property name="dbRouteConfig" ref="dbRouteConfig" />
+		<property name="defaultDB" ref="bossDefaultDB" />
+	</bean>
+	
+	<bean id="commonDAO" abstract="true" parent="baseDAO" class="slh.capture.dao.impl.CommonDAOImpl">
+	</bean>
+	
+	<!-- 自动扫描组件，这里要把web下面的 controller去除，他们是在applicationContext-action.xml中配置的，如果不去除会影响事务管理的-->
+	<context:component-scan base-package="slh.capture">
+		<context:exclude-filter type="regex" expression="slh.capture.action.*"/>
+	</context:component-scan>
+	
+	<!-- =================================  Start  事务控制 ================================== -->
+	<!-- 下面是配置声明式事务管理的，个人感觉比用注解管理事务要简单方便 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="bossDataSource"></property>
+	</bean>
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="query*" read-only="true"/>
+			<tx:method name="find*" read-only="true"/>
+			<tx:method name="load*" read-only="true"/>
+			<tx:method name="*" rollback-for="Exception"/>
+		</tx:attributes>
+	</tx:advice>
+	<aop:config proxy-target-class="true">
+		<aop:pointcut id="servicePointcut"
+			expression="execution(* slh.capture.service.*.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="servicePointcut" />
+	</aop:config>
+	<!-- =================================  End  事务控制 ================================== -->
+	
+</beans>

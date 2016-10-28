@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+		
+<sqlMap namespace="captureConfig">
+
+
+	<typeAlias alias="captureConfigEntity" type="slh.capture.domain.unified.CaptureConfigEntity" />
+	
+	<resultMap id="captureConfigResultMap" class="captureConfigEntity" >
+		<result column="id" property="id" />
+	    <result column="cp_name" property="cpName" />
+	    <result column="channel_code" property="channelCode" />
+	    <result column="app_name" property="appName" />
+	    <result column="user_name" property="userName" />
+	    <result column="password" property="password" />
+	    <result column="login_url" property="loginUrl" />
+	    <result column="query_url" property="queryUrl" />
+	    <result column="login_img_url" property="loginImgUrl" />
+	    <result column="query_page_url" property="queryPageUrl" />
+	    <result column="param_type" property="paramType" />
+	    <result column="params" property="params" />
+	    <result column="data_index" property="dataIndex" />
+	    <result column="table_attr" property="tableAttr" />
+	    <result column="table_attr_value" property="tableAttrValue" />
+	    <result column="random_code_type" property="randomCodeType" />
+	    <result column="random_src" property="randomSrc" />
+	    <result column="page_key" property="pageKey" />
+	    <result column="date_type" property="dateType" />
+	    <result column="time_query_type" property="timeQueryType" />
+	    <result column="biz_type" property="bizType" />
+	    <result column="identify_type" property="identifyType" />
+	    <result column="login_param" property="loginParam" />
+	</resultMap>
+	
+	<resultMap id="cpNameResultMap" class="captureConfigEntity" >
+	    <result column="cp_name" property="cpName" />
+	</resultMap>
+	
+	<resultMap id="appNameResultMap" class="captureConfigEntity" >
+	    <result column="app_name" property="appName" />
+	</resultMap>
+	
+	<resultMap id="channelCodeResultMap" class="captureConfigEntity" >
+	    <result column="channel_code" property="channelCode" />
+	</resultMap>
+	
+	<resultMap id="resultCodeMap" class="captureConfigEntity" >
+	    <result column="identify_type" property="identifyType" />
+	    <result column="time_query_type" property="timeQueryType" />
+	</resultMap>
+	
+	<resultMap id="userNameResultMap" class="captureConfigEntity" >
+	    <result column="user_name" property="userName" />
+	</resultMap>
+
+	<sql id="captureConfigConditions">
+		WHERE 
+		1=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="id">
+				id = #id#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="cpName">
+				cp_name = #cpName#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="channelCode">
+				channel_code = #channelCode#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appName">
+				app_name = #appName#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="userName">
+				user_name = #userName#
+			</isNotEmpty>
+		</dynamic>	
+	</sql>	
+	
+	<select id="SELECT_CAPTURECONFIG_LIST" resultMap="captureConfigResultMap" parameterClass="java.util.Map">
+		SELECT 
+		id,
+		cp_name,
+		channel_code,
+		app_name,
+		user_name,
+        `password`,
+		login_url,
+		query_url,
+		login_img_url,
+		query_page_url,
+		param_type,
+		params,
+		data_index,
+		table_attr,
+		table_attr_value,
+		random_src,
+		page_key,
+		random_code_type,
+		date_type,
+		time_query_type,
+		biz_type,
+		identify_type,
+		login_param
+		FROM slh_capture_data_capture_config 
+        <include refid="captureConfigConditions" />
+		ORDER BY cp_name, channel_code, app_name 
+	</select>
+	
+	<select id="SELECT_CP_NAME_LIST" resultMap="cpNameResultMap" parameterClass="java.util.Map">
+		SELECT 
+        distinct (cp_name) as cp_name
+		FROM slh_capture_data_capture_config 
+        <include refid="captureConfigConditions" />
+		ORDER BY cp_name 
+	</select>
+	
+	<select id="SELECT_CHANNEL_CODE_LIST" resultMap="channelCodeResultMap" parameterClass="java.util.Map">
+		SELECT 
+        distinct(channel_code) as channel_code
+		FROM slh_capture_data_capture_config 
+        <include refid="captureConfigConditions" />
+		ORDER BY channel_code 
+	</select>
+	
+	<select id="SELECT_APP_NAME_LIST" resultMap="appNameResultMap" parameterClass="java.util.Map">
+		SELECT 
+        distinct(app_name) as app_name
+		FROM slh_capture_data_capture_config 
+        <include refid="captureConfigConditions" />
+		ORDER BY app_name 
+	</select>
+	
+	<select id="SELECT_USER_NAME_LIST" resultMap="userNameResultMap" parameterClass="java.util.Map">
+		SELECT 
+        distinct(user_name) as user_name
+		FROM slh_capture_data_capture_config 
+        <include refid="captureConfigConditions" />
+		ORDER BY app_name 
+	</select>
+
+	<sql id="captureConfigQueryConditions" >
+	    <dynamic>
+	    	<isNotEmpty property="cpName">
+	    		<isNotNull prepend="and" property="cpName" >
+			        cp_name like concat('%', #cpName#, '%')
+			    </isNotNull>
+	    	</isNotEmpty>
+	    </dynamic>
+	</sql>
+
+	<select id="query_slh_count" resultClass="java.lang.Integer"	parameterClass="captureConfigEntity">
+		SELECT COUNT(1) FROM slh_capture_data_capture_config 
+		WHERE 1 = 1
+		<include refid="captureConfigQueryConditions"/>
+	</select>	
+	
+	<select id="select_slh_model_page_list" resultMap="captureConfigResultMap" parameterClass="captureConfigEntity">
+		SELECT 
+		id,
+		cp_name,
+		channel_code,
+		app_name,
+		user_name,
+		password,
+		login_url,
+		query_url,
+		login_img_url,
+		query_page_url,
+		param_type,
+		data_index,
+		params,
+		data_index,		
+		table_attr,
+		table_attr_value,
+		random_src,
+		page_key,
+		random_code_type,
+		date_type,
+		time_query_type,
+		biz_type,
+		identify_type,
+		login_param				
+		FROM slh_capture_data_capture_config 
+		WHERE 
+		1=1
+		<include refid="captureConfigQueryConditions"/>
+		ORDER BY modify_time DESC
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+	
+	<insert id="insertCaptureConfig" parameterClass="captureConfigEntity">
+		INSERT INTO slh_capture_data_capture_config ( cp_name, channel_code, identify_type,app_name, user_name,password,biz_type, login_url,query_url, login_img_url, query_page_url,param_type,data_index,params,table_attr,table_attr_value,random_code_type,random_src,page_key,date_type,time_query_type,login_param, create_time, modify_time)
+	  	VALUES (#cpName#, #channelCode#,#identifyType#, #appName#, #userName#,#password#,#bizType#, #loginUrl#, #queryUrl#, #loginImgUrl#, #queryPageUrl#, #paramType#,#dataIndex#,#params#,#tableAttr#,#tableAttrValue#,#randomCodeType#,#randomSrc#,#pageKey#,#dateType#,#timeQueryType#,#loginParam#, NOW(), NOW())
+		<selectKey resultClass="java.lang.Integer" keyProperty="id" >
+		  SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	<select id="findCaptureConfigById" resultMap="captureConfigResultMap" parameterClass="captureConfigEntity">
+		SELECT 
+		id,
+		cp_name,
+		channel_code,
+		app_name,
+		user_name,
+		password,
+		login_url,
+		query_url,
+		login_img_url,
+		query_page_url,
+		param_type,
+		data_index,
+		params,
+		table_attr,
+		table_attr_value,
+		random_src,
+		page_key,
+		random_code_type,
+		date_type,
+		time_query_type,
+		biz_type,
+		identify_type,
+		login_param
+		FROM slh_capture_data_capture_config 
+		WHERE id = #id#
+	</select>
+	
+	<update id="updateCaptureConfigById" parameterClass="captureConfigEntity" >
+	  UPDATE slh_capture_data_capture_config SET modify_time = NOW()
+	  <dynamic>
+	    <isNotNull prepend="," property="cpName">
+	      cp_name = #cpName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="channelCode">
+	      channel_code = #channelCode#
+	    </isNotNull>
+	    <isNotNull prepend="," property="dataIndex">
+	      data_index = #dataIndex#
+	    </isNotNull>
+	    <isNotNull prepend="," property="appName">
+	      app_name = #appName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="userName">
+	      user_name = #userName#
+	    </isNotNull>
+	    <isNotNull prepend="," property="password">
+	      password = #password#
+	    </isNotNull>
+	    <isNotNull prepend="," property="paramType">
+	      param_type = #paramType#
+	    </isNotNull>
+	    <isNotNull prepend="," property="params">
+	      params = #params#
+	    </isNotNull>
+	    <isNotNull prepend="," property="loginUrl">
+	      login_url = #loginUrl#
+	    </isNotNull>
+	    <isNotNull prepend="," property="loginImgUrl">
+	      login_img_url = #loginImgUrl#
+	    </isNotNull>
+	    <isNotNull prepend="," property="queryPageUrl">
+	      query_page_url = #queryPageUrl#
+	    </isNotNull>
+	    <isNotNull prepend="," property="queryUrl">
+	      query_url = #queryUrl#
+	    </isNotNull>
+	    <isNotNull prepend="," property="tableAttr">
+	      table_attr = #tableAttr#
+	    </isNotNull>
+	    <isNotNull prepend="," property="tableAttrValue">
+	      table_attr_value = #tableAttrValue#
+	    </isNotNull>
+	    <isNotNull prepend="," property="randomSrc">
+	      random_src = #randomSrc#
+	    </isNotNull>
+	    <isNotNull prepend="," property="pageKey">
+	      page_key = #pageKey#
+	    </isNotNull>
+	    <isNotNull prepend="," property="randomCodeType">
+	      random_code_type = #randomCodeType#
+	    </isNotNull>
+	     <isNotNull prepend="," property="dateType">
+	      date_type = #dateType#
+	    </isNotNull>
+	     <isNotNull prepend="," property="timeQueryType">
+	      time_query_type = #timeQueryType#
+	    </isNotNull>
+	    <isNotNull prepend="," property="bizType">
+	      biz_type = #bizType#
+	    </isNotNull>
+	    <isNotNull prepend="," property="identifyType">
+	      identify_type = #identifyType#
+	    </isNotNull>
+	    <isNotNull prepend="," property="loginParam">
+	      login_param = #loginParam#
+	    </isNotNull>
+	  </dynamic>
+	  WHERE id = #id#
+	</update>
+	
+	<delete id="removeCaptureConfig" parameterClass="captureConfigEntity">
+		delete from slh_capture_data_capture_config where id=#id#
+	</delete>
+	
+	<select id="checkCode" parameterClass="captureConfigEntity" resultMap="resultCodeMap">
+		select 
+		identify_type,
+		time_query_type
+		from slh_capture_data_capture_config
+		where cp_name=#cpName#
+		<dynamic>
+			<isNotEmpty prepend="and" property="userName">
+				user_name=#userName#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+</sqlMap>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map Config 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<settings cacheModelsEnabled="false" enhancementEnabled="false"
+		lazyLoadingEnabled="false" maxRequests="3000" maxSessions="3000"
+		maxTransactions="3000" useStatementNamespaces="true" />
+
+	<sqlMap resource="ibatis/mapping/slh_menu_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_role_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_user_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_channelmange_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_introduct_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_recive_query_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_payment_query_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_operate_data_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_scrab_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_capture_plat_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/capture_config_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_account_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_app_sqlmap_mapping.xml" />
+	<sqlMap resource="ibatis/mapping/slh_capture_data_sqlmap_mapping.xml" />
+	
+	
+</sqlMapConfig>

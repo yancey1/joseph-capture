@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap 
+	PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+	"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="slh_app">
+
+	<typeAlias alias="appDomain" type="slh.capture.domain.AppDomain" />
+
+	<resultMap id="appResultMap" class="appDomain">
+		<result column="id" property="id" />
+		<result column="app_name" property="appName" />
+		<result column="app_url" property="appUrl" />
+		<result column="account_id" property="accountId" />
+		<result column="account_name" property="accountName" />
+		<result column="remark" property="remark" />
+		<result column="create_time" property="createTime" />
+		<result column="modify_time" property="modifyTime" />
+	</resultMap>
+
+	<sql id="slh_app_query_conditions">
+		<dynamic>
+			<isNotEmpty prepend="and" property="appName">
+				app_name like concat('%',#appName#,'%')
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="accountId">
+				account_id =#accountId#
+			</isNotEmpty>
+		</dynamic>
+	</sql>
+
+	<select id="getAppCount" resultClass="java.lang.Integer"
+		parameterClass="appDomain">
+		SELECT COUNT(1) FROM slh_app_info
+		WHERE 1 = 1
+		<include refid="slh_app_query_conditions" />
+	</select>
+
+	<select id="getAppList" resultMap="appResultMap"
+		parameterClass="appDomain">
+		SELECT
+		id,
+		app_name,
+		app_url,
+		account_id,
+		(select name from slh_account_info where id=account_id) as account_name,
+		remark,
+		create_time,
+		modify_time
+		FROM slh_app_info
+		WHERE 1=1
+		<include refid="slh_app_query_conditions" />
+		order by modify_time desc
+		LIMIT #pageInfo.currentRow#, #pageInfo.rows#
+	</select>
+
+	<insert id="insertApp" parameterClass="appDomain">
+		INSERT INTO slh_app_info (app_name, app_url,account_id,remark, create_time,
+		modify_time)
+		VALUES (#appName#, #appUrl#,#accountId#,#remark#, NOW(), NOW())
+	</insert>
+
+	<update id="modifyApp" parameterClass="appDomain">
+		UPDATE slh_app_info SET modify_time = NOW()
+		<dynamic>
+			<isNotEmpty prepend="," property="appName">
+				app_name = #appName#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="appUrl">
+				app_url = #appUrl#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="accountId">
+				account_id = #accountId#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="remark">
+				remark = #remark#
+			</isNotEmpty>
+		</dynamic>
+		WHERE id = #id#
+	</update>
+
+	<delete id="deleteApp" parameterClass="java.lang.Integer">
+		delete from
+		slh_app_info where id = #id#
+	</delete>
+
+	<select id="getAppListByApp" resultMap="appResultMap"
+		parameterClass="appDomain">
+		SELECT
+		id,
+		app_name,
+		app_url,
+		account_id,
+		(select name from slh_account_info where id=account_id) as account_name,
+		remark,
+		create_time,
+		modify_time
+		FROM slh_app_info
+		WHERE 1=1
+		<dynamic>
+			<isNotEmpty prepend="and" property="appName">
+			    app_name=#appName#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="accountId">
+			    account_id=#accountId#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="id">
+			    id &lt;&gt; #id#
+			</isNotEmpty>
+			<isNotEmpty prepend="and" property="appId">
+			    id = #appId#
+			</isNotEmpty>
+		</dynamic>
+	</select>
+
+</sqlMap>
